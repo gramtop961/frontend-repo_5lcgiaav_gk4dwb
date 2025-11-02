@@ -1,40 +1,49 @@
-export default function UploadSection({ onFileSelect, previewUrl, error }) {
-  const handleChange = (e) => {
-    const file = e.target.files && e.target.files[0]
-    if (!file) return
-    const validTypes = ['image/jpeg', 'image/png', 'image/jpg']
-    if (!validTypes.includes(file.type)) {
-      onFileSelect(null, 'Please upload a JPG or PNG image.')
-      return
+import { Image, Upload } from 'lucide-react';
+
+export default function UploadSection({ onImageSelect, imagePreview }) {
+  const onFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const valid = ['image/jpeg', 'image/jpg', 'image/png'];
+    if (!valid.includes(file.type)) {
+      alert('Please upload a JPG or PNG image.');
+      return;
     }
-    onFileSelect(file, null)
-  }
+    const reader = new FileReader();
+    reader.onload = () => {
+      onImageSelect(file, reader.result);
+    };
+    reader.readAsDataURL(file);
+  };
 
   return (
-    <section className="w-full max-w-3xl mx-auto text-center space-y-4">
-      <div>
-        <label className="inline-flex items-center justify-center px-6 py-4 rounded-xl cursor-pointer bg-white text-gray-900 font-semibold shadow-lg hover:shadow-xl transition-all">
+    <div className="h-full rounded-2xl border border-zinc-700/60 bg-gradient-to-b from-zinc-950 to-zinc-900/70 p-5">
+      <h3 className="text-sm font-medium text-zinc-300 mb-3">1. Upload a portrait</h3>
+      <label className="block cursor-pointer">
+        <div className="flex items-center justify-center gap-3 rounded-xl border border-dashed border-zinc-700/70 bg-zinc-900/60 p-6 hover:border-zinc-600 transition">
+          <Upload size={18} className="text-zinc-400" />
+          <span className="text-sm text-zinc-300">Choose JPG or PNG</span>
           <input
             type="file"
-            accept=".jpg,.jpeg,.png"
+            accept="image/jpeg,image/jpg,image/png"
+            onChange={onFileChange}
             className="hidden"
-            onChange={handleChange}
-          />
-          Upload Your Photo
-        </label>
-      </div>
-      {error && (
-        <p className="text-sm text-rose-200">{error}</p>
-      )}
-      {previewUrl && (
-        <div className="flex justify-center">
-          <img
-            src={previewUrl}
-            alt="Preview"
-            className="max-w-[400px] w-full rounded-lg border border-white/20 shadow-md"
           />
         </div>
+      </label>
+
+      {imagePreview ? (
+        <div className="mt-4">
+          <div className="text-xs text-zinc-400 mb-1">Preview</div>
+          <div className="rounded-xl overflow-hidden border border-zinc-700/60 bg-black/40 inline-block max-w-full">
+            <img src={imagePreview} alt="preview" className="max-w-[420px] w-full object-contain" />
+          </div>
+        </div>
+      ) : (
+        <div className="mt-4 text-xs text-zinc-500 flex items-center gap-2">
+          <Image size={14} /> Recommended: well-lit, single-person portrait.
+        </div>
       )}
-    </section>
-  )
+    </div>
+  );
 }
